@@ -1,0 +1,63 @@
+import java.util.*;
+
+public class MutualFollowers {
+
+    public static void main(String[] args) {
+        List<User> users = Arrays.asList(
+                new User(1, "Alice", Arrays.asList(2, 3)),
+                new User(2, "Bob", Arrays.asList(1)),
+                new User(3, "Charlie", Arrays.asList(4)),
+                new User(4, "David", Arrays.asList(3))
+        );
+
+        List<List<Integer>> outcome = findMutualFollowers(users);
+
+        System.out.println("2");
+        System.out.println("{");
+        System.out.println("\"regNo\": \"REG12347\",");
+        System.out.println("\"outcome\": " + outcome);
+        System.out.println("}");
+    }
+
+    static List<List<Integer>> findMutualFollowers(List<User> users) {
+        Map<Integer, Set<Integer>> followsMap = new HashMap<>();
+
+        // Build a map of user ID to the set of users they follow
+        for (User user : users) {
+            followsMap.put(user.id, new HashSet<>(user.follows));
+        }
+
+        Set<String> seenPairs = new HashSet<>();
+        List<List<Integer>> result = new ArrayList<>();
+
+        for (User user : users) {
+            int id = user.id;
+            for (int followedId : user.follows) {
+                // Check if the followed user also follows this user
+                if (followsMap.containsKey(followedId) && followsMap.get(followedId).contains(id)) {
+                    int min = Math.min(id, followedId);
+                    int max = Math.max(id, followedId);
+                    String pairKey = min + "-" + max;
+                    if (!seenPairs.contains(pairKey)) {
+                        result.add(Arrays.asList(min, max));
+                        seenPairs.add(pairKey);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    static class User {
+        int id;
+        String name;
+        List<Integer> follows;
+
+        public User(int id, String name, List<Integer> follows) {
+            this.id = id;
+            this.name = name;
+            this.follows = follows;
+        }
+    }
+}
